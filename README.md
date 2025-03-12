@@ -8,7 +8,7 @@ terraform module to provision resources related to harness ccm cluster orchestra
 
 ```
 module "cluster-orchestrator" {
-  source = "terraform-aws-harness-ccm-cluster-orchestrator"
+  source = "git::https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator.git"
 
   cluster_name     = "dev"
   cluster_oidc_arn = "arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/EXAMPLE"
@@ -31,7 +31,7 @@ If you provision your VPC and EKS using the AWS provided TF modules, you can dir
 
 ```
 module "cluster-orchestrator" {
-  source = "terraform-aws-harness-ccm-cluster-orchestrator"
+  source = "git::https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator.git"
 
   cluster_name     = module.eks.cluster_name
   cluster_oidc_arn = module.eks.oidc_provider_arn
