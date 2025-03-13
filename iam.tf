@@ -12,7 +12,7 @@ data "aws_iam_policy_document" "assume_inline_policy" {
 resource "aws_iam_role" "node_role" {
   name                = format("%s-%s-%s", "harness-ccm", local.short_cluster_name, "node")
   assume_role_policy  = data.aws_iam_policy_document.assume_inline_policy.json
-  description         = format("%s %s %s", "Role to manage", data.aws_eks_cluster.cluster.name, "EKS cluster used by Harness CCM")
+  description         = format("%s %s %s", "Role to manage", var.cluster_name, "EKS cluster used by Harness CCM")
   managed_policy_arns = ["arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly", "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy", "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy", "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy", "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"]
 }
 
@@ -70,6 +70,6 @@ data "aws_iam_policy_document" "controller_trust_policy" {
 resource "aws_iam_role" "controller_role" {
   name                = format("%s-%s-%s", "harness-ccm", local.short_cluster_name, "controller")
   assume_role_policy  = data.aws_iam_policy_document.controller_trust_policy.json
-  description         = format("%s %s %s", "Role to manage", data.aws_eks_cluster.cluster.name, "EKS cluster controller used by Harness CCM")
+  description         = format("%s %s %s", "Role to manage", var.cluster_name, "EKS cluster controller used by Harness CCM")
   managed_policy_arns = [aws_iam_policy.controller_role_policy.arn]
 }

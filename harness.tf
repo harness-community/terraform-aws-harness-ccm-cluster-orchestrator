@@ -1,6 +1,6 @@
 resource "harness_cluster_orchestrator" "cluster_orchestrator" {
   name             = local.short_cluster_name
-  cluster_endpoint = data.aws_eks_cluster.cluster.endpoint
+  cluster_endpoint = var.cluster_endpoint
   k8s_connector_id = var.ccm_k8s_connector_id
 }
 

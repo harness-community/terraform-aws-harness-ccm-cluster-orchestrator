@@ -10,8 +10,9 @@ terraform module to provision resources related to harness ccm cluster orchestra
 module "cluster-orchestrator" {
   source = "git::https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator.git"
 
-  cluster_name     = "dev"
-  cluster_oidc_arn = "arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/EXAMPLE"
+  cluster_name       = "dev"
+  cluster_endpoint   = "https://example-cluster-endpoint.amazonaws.com"
+  cluster_oidc_arn   = "arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/EXAMPLE"
   cluster_subnet_ids = [
     "subnet-12345678"
   ]
@@ -33,9 +34,10 @@ If you provision your VPC and EKS using the AWS provided TF modules, you can dir
 module "cluster-orchestrator" {
   source = "git::https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator.git"
 
-  cluster_name     = module.eks.cluster_name
-  cluster_oidc_arn = module.eks.oidc_provider_arn
-  cluster_subnet_ids = module.vpc.private_subnets
+  cluster_name               = module.eks.cluster_name
+  cluster_endpoint           = module.eks.cluster_endpoint
+  cluster_oidc_arn           = module.eks.oidc_provider_arn
+  cluster_subnet_ids         = module.vpc.private_subnets
   cluster_security_group_ids = module.eks.node_security_group_id
   cluster_amis = [
     "ami-12345678"
@@ -79,7 +81,6 @@ No modules.
 | [harness_platform_role_assignments.cluster_orch_role](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/platform_role_assignments) | resource |
 | [harness_platform_service_account.cluster_orch_service_account](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/platform_service_account) | resource |
 | [harness_platform_token.api_token](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/platform_token) | resource |
-| [aws_eks_cluster.cluster](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster) | data source |
 | [aws_iam_policy_document.assume_inline_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.controller_trust_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [harness_platform_current_account.current](https://registry.terraform.io/providers/harness/harness/latest/docs/data-sources/platform_current_account) | data source |
@@ -90,6 +91,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | ccm\_k8s\_connector\_id | harness ccm kubernetes connector for the cluster | `string` | n/a | yes |
 | cluster\_amis | AMIs used in your EKS cluster; If passed will be tagged with required orchestrator labels | `list(string)` | `[]` | no |
+| cluster\_endpoint | EKS cluster endpoint | `string` | n/a | yes |
 | cluster\_name | EKS cluster Name | `string` | n/a | yes |
 | cluster\_oidc\_arn | OIDC Provder ARN for the cluster | `string` | n/a | yes |
 | cluster\_security\_group\_ids | Security group IDs used in your EKS cluster; If passed will be tagged with required orchestrator labels | `list(string)` | `[]` | no |

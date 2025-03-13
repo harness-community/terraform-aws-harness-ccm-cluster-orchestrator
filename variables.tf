@@ -3,6 +3,11 @@ variable "cluster_name" {
   description = "EKS cluster Name"
 }
 
+variable "cluster_endpoint" {
+  type        = string
+  description = "EKS cluster endpoint"
+}
+
 variable "cluster_oidc_arn" {
   type        = string
   description = "OIDC Provder ARN for the cluster"
