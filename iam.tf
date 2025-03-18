@@ -22,7 +22,7 @@ resource "aws_iam_instance_profile" "instance_profile" {
 }
 
 resource "aws_iam_policy" "controller_role_policy" {
-  name = "ClusterOrchestratorControllerPolicy"
+  name = format("%s-%s", local.short_cluster_name, "ClusterOrchController")
   policy = jsonencode({
     "Version" : "2012-10-17",
     "Statement" : [
