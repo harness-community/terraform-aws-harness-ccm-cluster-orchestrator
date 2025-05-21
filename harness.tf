@@ -27,6 +27,12 @@ resource "harness_platform_apikey" "api_key" {
   parent_id   = harness_platform_service_account.cluster_orch_service_account.id
   apikey_type = "SERVICE_ACCOUNT"
   account_id  = data.harness_platform_current_account.current.id
+
+  lifecycle {
+    ignore_changes = [
+      default_time_to_expire_token
+    ]
+  }
 }
 
 resource "harness_platform_token" "api_token" {
