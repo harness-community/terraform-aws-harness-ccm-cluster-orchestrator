@@ -45,7 +45,8 @@ resource "aws_iam_policy" "controller_role_policy" {
           "ssm:GetParameter",
           "pricing:GetProducts",
           "ec2:DescribeSpotPriceHistory",
-          "ec2:DescribeImages"
+          "ec2:DescribeImages",
+          "ec2:GetSpotPlacementScores",
         ],
         "Resource" : "*",
         "Effect" : "Allow"
