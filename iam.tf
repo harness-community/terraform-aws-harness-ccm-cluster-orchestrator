@@ -52,6 +52,7 @@ resource "aws_iam_policy" "controller_role_policy" {
           "ec2:DescribeSpotPriceHistory",
           "ec2:DescribeImages",
           "ec2:GetSpotPlacementScores",
+          "eks:DescribeCluster"
         ],
         "Resource" : "*",
         "Effect" : "Allow"
