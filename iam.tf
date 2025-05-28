@@ -84,3 +84,9 @@ resource "aws_iam_role_policy_attachment" "controller_role" {
   role       = aws_iam_role.controller_role.name
   policy_arn = aws_iam_policy.controller_role_policy.arn
 }
+
+resource "aws_eks_access_entry" "node_role" {
+  cluster_name  = var.cluster_name
+  principal_arn = aws_iam_role.node_role.arn
+  type          = "EC2_LINUX"
+}
