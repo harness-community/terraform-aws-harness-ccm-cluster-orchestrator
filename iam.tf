@@ -62,6 +62,7 @@ resource "aws_iam_policy" "controller_role_policy" {
 }
 
 data "aws_iam_policy_document" "controller_trust_policy_oidc" {
+  count = var.cluster_oidc_arn != null ? 1 : 0
   statement {
     actions = ["sts:AssumeRole", "sts:AssumeRoleWithWebIdentity"]
     principals {
@@ -75,6 +76,7 @@ data "aws_iam_policy_document" "controller_trust_policy_oidc" {
 }
 
 data "aws_iam_policy_document" "controller_trust_policy_fargate" {
+  count = var.fargate_profile_arn != null ? 1 : 0
   statement {
     actions = ["sts:AssumeRole"]
     condition {
@@ -96,8 +98,9 @@ data "aws_iam_policy_document" "controller_trust_policy_fargate" {
 
 data "aws_iam_policy_document" "controller_trust_policy" {
   source_policy_documents = concat(
-    var.cluster_oidc_arn != null ? [data.aws_iam_policy_document.controller_trust_policy_oidc.json] : [],
-  var.fargate_profile_arn != null ? [data.aws_iam_policy_document.controller_trust_policy_fargate.json] : [])
+    var.cluster_oidc_arn != null ? [data.aws_iam_policy_document.controller_trust_policy_oidc[0].json] : [],
+    var.fargate_profile_arn != null ? [data.aws_iam_policy_document.controller_trust_policy_fargate[0].json] : []
+  )
 }
 
 resource "aws_iam_role" "controller_role" {
