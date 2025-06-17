@@ -10,7 +10,14 @@ variable "cluster_endpoint" {
 
 variable "cluster_oidc_arn" {
   type        = string
-  description = "OIDC Provder ARN for the cluster"
+  description = "OIDC Provder ARN for the cluster when not using fargate profiles for the orchestrator"
+  default     = null
+}
+
+variable "fargate_profile_arn" {
+  type        = string
+  description = "Fargate profile ARN for the profile being used for the orchestrator"
+  default     = null
 }
 
 variable "cluster_subnet_ids" {

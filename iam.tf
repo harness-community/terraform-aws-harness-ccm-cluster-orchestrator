@@ -61,7 +61,7 @@ resource "aws_iam_policy" "controller_role_policy" {
   })
 }
 
-data "aws_iam_policy_document" "controller_trust_policy" {
+data "aws_iam_policy_document" "controller_trust_policy_oidc" {
   statement {
     actions = ["sts:AssumeRole", "sts:AssumeRoleWithWebIdentity"]
     principals {
@@ -72,6 +72,32 @@ data "aws_iam_policy_document" "controller_trust_policy" {
     }
     effect = "Allow"
   }
+}
+
+data "aws_iam_policy_document" "controller_trust_policy_fargate" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        var.fargate_profile_arn
+      ]
+    }
+    principals {
+      type = "Service"
+      identifiers = [
+        "eks-fargate-pods.amazonaws.com"
+      ]
+    }
+    effect = "Allow"
+  }
+}
+
+data "aws_iam_policy_document" "controller_trust_policy" {
+  source_policy_documents = concat(
+    var.cluster_oidc_arn != null ? [data.aws_iam_policy_document.controller_trust_policy_oidc.json] : [],
+  var.fargate_profile_arn != null ? [data.aws_iam_policy_document.controller_trust_policy_fargate.json] : [])
 }
 
 resource "aws_iam_role" "controller_role" {
