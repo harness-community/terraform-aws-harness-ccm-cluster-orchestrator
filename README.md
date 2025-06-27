@@ -96,6 +96,7 @@ No modules.
 | cluster\_oidc\_arn | OIDC Provder ARN for the cluster | `string` | n/a | yes |
 | cluster\_security\_group\_ids | Security group IDs used in your EKS cluster; If passed will be tagged with required orchestrator labels | `list(string)` | `[]` | no |
 | cluster\_subnet\_ids | Subnet IDs used in your EKS cluster; If passed will be tagged with required orchestrator labels | `list(string)` | `[]` | no |
+| node\_role\_policies | List of IAM policies to attach to the node role | `list(string)` | `[]` | no |
 
 ## Outputs
 
