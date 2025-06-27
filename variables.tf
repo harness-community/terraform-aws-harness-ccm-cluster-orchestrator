@@ -35,3 +35,9 @@ variable "ccm_k8s_connector_id" {
   type        = string
   description = "harness ccm kubernetes connector for the cluster"
 }
+
+variable "node_role_policies" {
+  type        = list(string)
+  default     = []
+  description = "List of IAM policies to attach to the node role"
+}
