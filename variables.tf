@@ -41,3 +41,16 @@ variable "node_role_policies" {
   default     = []
   description = "List of IAM policies to attach to the node role"
 }
+
+variable "ami_type" {
+  type        = string
+  default     = "AL2_x86_64"
+  description = "Type of AMI to use for the node group"
+}
+
+variable "kubernetes_version" {
+  type        = string
+  default     = null
+  description = "Kubernetes version to use for the node group. Required if ami_type is set"
+}
+  
