@@ -39,13 +39,13 @@ locals {
   }
 
   latest_ami_release_versions = var.ami_type != null ? [nonsensitive(data.aws_ssm_parameter.ami[0].value)] : []
-  amis_to_tag                 = concat(var.cluster_amis, latest_ami_release_versions)
+  amis_to_tag                 = concat(var.cluster_amis, local.latest_ami_release_versions)
 }
 
 data "aws_ssm_parameter" "ami" {
   count = var.ami_type != null ? 1 : 0
 
-  region = data.aws_region.current.name
+  region = data.aws_region.current.region
 
   name = local.ssm_ami_type_to_ssm_param[var.ami_type]
 }
