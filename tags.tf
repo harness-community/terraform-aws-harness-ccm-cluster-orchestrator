@@ -38,7 +38,7 @@ locals {
     AL2023_ARM_64_NVIDIA       = "/aws/service/eks/optimized-ami/${var.kubernetes_version}/amazon-linux-2023/arm64/nvidia/recommended/image_id"
   }
 
-  latest_amis = var.ami_type != null ? startswith(var.ami_type, "WINDOWS") ? nonsensitive(jsondecode(data.aws_ssm_parameter.ami[0].value)["release_version"]) : null[nonsensitive(data.aws_ssm_parameter.ami[0].value)] : []
+  latest_amis = var.ami_type != null ? startswith(var.ami_type, "WINDOWS") ? [nonsensitive(jsondecode(data.aws_ssm_parameter.ami[0].value)["release_version"])] : [nonsensitive(data.aws_ssm_parameter.ami[0].value)] : []
   amis_to_tag = concat(var.cluster_amis, local.latest_amis)
 }
 
