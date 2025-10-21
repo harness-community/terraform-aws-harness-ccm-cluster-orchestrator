@@ -18,3 +18,7 @@ output "eks_cluster_node_role_arn" {
 output "harness_cluster_orchestrator_id" {
   value = harness_cluster_orchestrator.cluster_orchestrator.id
 }
+
+output "eks_cluster_amis" {
+  value = local.amis_to_tag
+}
