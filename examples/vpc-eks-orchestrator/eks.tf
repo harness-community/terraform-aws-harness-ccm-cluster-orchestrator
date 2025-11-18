@@ -1,3 +1,5 @@
+# create the cluster
+#   - tag the cluster security group with the harness required tags for the orchestrator
 module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "= 21.8.0"
@@ -14,7 +16,9 @@ module "eks" {
     }
     kube-proxy = {}
     vpc-cni = {
-      before_compute = true
+      before_compute              = true
+      resolve_conflicts_on_create = "OVERWRITE"
+      addon_version               = "v1.20.4-eksbuild.1"
     }
   }
 
@@ -31,7 +35,7 @@ module "eks" {
 
       ami_type = var.ami-type
 
-      instance_types = ["t4a.xlarge"]
+      instance_types = ["t4g.medium"]
 
       min_size     = 1
       max_size     = 1
@@ -47,6 +51,7 @@ module "eks" {
   }
 }
 
+# deploy a harness delegate into the cluster
 resource "harness_platform_delegatetoken" "eks" {
   name       = "eks-${local.name}"
   account_id = data.harness_platform_current_account.current.id
@@ -69,7 +74,7 @@ module "delegate" {
   depends_on = [module.eks]
 }
 
-# harness connectors
+# create the harness k8s connectors
 resource "harness_platform_connector_kubernetes" "eks" {
   identifier = "eks_${local.safe_name}"
   name       = "eks-${local.name}"

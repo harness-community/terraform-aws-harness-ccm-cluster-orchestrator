@@ -1,20 +1,23 @@
+# create the orchestrator components in aws and harness
 module "cluster-orchestrator" {
-  source = "git::https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator.git?ref=main"
+  source = "../../"
+  # source = "git::https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator.git?ref=main"
 
   cluster_name     = data.aws_eks_cluster.this.name
   cluster_endpoint = data.aws_eks_cluster.this.endpoint
-  cluster_oidc_arn = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:oidc-provider/oidc.eks.${data.aws_region.current.region}.amazonaws.com/id/${split("/", data.aws_eks_cluster.this.identity.oidc.issuer).last}"
+  cluster_oidc_arn = data.aws_iam_openid_connect_provider.this.arn
 
-  ami_type           = ami_type
-  cluster_amis       = cluster_amis
+  ami_type           = var.ami_type
+  cluster_amis       = var.cluster_amis
   kubernetes_version = data.aws_eks_cluster.this.version
 
-  cluster_subnet_ids         = data.aws_eks_cluster.this.vpc_config.subnet_ids
-  cluster_security_group_ids = set(concat(data.aws_eks_cluster.this.vpc_config.cluster_security_group_id, data.aws_eks_cluster.this.vpc_config.security_group_ids))
+  cluster_subnet_ids         = data.aws_eks_cluster.this.vpc_config[0].subnet_ids
+  cluster_security_group_ids = toset(concat(data.aws_eks_cluster.this.vpc_config[0].cluster_security_group_id, data.aws_eks_cluster.this.vpc_config[0].security_group_ids))
 
   ccm_k8s_connector_id = var.ccm_k8s_connector_id
 }
 
+# define your specific settings for how the orchestrator should run
 resource "harness_cluster_orchestrator_config" "orchestrator" {
   orchestrator_id = module.cluster-orchestrator.harness_cluster_orchestrator_id
   distribution {
@@ -24,6 +27,7 @@ resource "harness_cluster_orchestrator_config" "orchestrator" {
   }
 }
 
+# deploy the orchestrator into the cluster
 resource "helm_release" "orchestrator" {
   name             = "harness-ccm-cluster-orchestrator"
   repository       = "https://lightwing-downloads.s3.ap-southeast-1.amazonaws.com/cluster-orchestrator-helm-chart"

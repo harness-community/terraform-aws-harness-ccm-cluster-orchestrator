@@ -18,6 +18,14 @@ provision an EKS cluster with a single dedicated node to run the orchestrator an
 
 create a harness delegate token, deploy a delegate using helm, and create a k8s and ccm k8s connector at the account level
 
+a basic cluster, to run a few add-ons, the delegate, and the orchestrator components has the following resource needs:
+```
+│   cpu      1350m (34%)   2 (51%)       │
+│   memory   2188Mi (14%)  4536Mi (30%)  │
+```
+
+we can use a single t4g.medium ($25/mo on-demand, $15/mo reserved) node to run dedicated components
+
 ## orchestrator
 
 `orchestrator.tf`

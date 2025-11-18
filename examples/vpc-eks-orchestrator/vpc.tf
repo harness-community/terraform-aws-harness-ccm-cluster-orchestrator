@@ -1,3 +1,5 @@
+# create the vpc
+#   - tag the vpc subnets with the harness required tags for the orchestrator
 module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "~> 6.0"
@@ -48,6 +50,7 @@ locals {
   zipped_private_routetables = zipmap(local.index_list, module.vpc.private_route_table_ids)
 }
 
+# use fck nat instead of aws nat gateway to save 90% of costs
 # https://fck-nat.dev/stable/
 module "fck-nat" {
   source = "RaJiska/fck-nat/aws"

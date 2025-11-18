@@ -1,6 +1,6 @@
 # orchestrator
 
-set up the orchestrator agaisnt an eks cluster which has already been deployed and bootstrapped with a harness delegate and connectors
+set up the orchestrator against an eks cluster which has already been deployed and bootstrapped with a harness delegate and connectors
 
 ## orchestrator
 

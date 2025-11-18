@@ -3,9 +3,14 @@ variable "cluster_name" {
   description = "The target EKS cluster name"
 }
 
+variable "cluster_oidc_arn" {
+  type        = string
+  description = "The target EKS cluster's OIDC provider ARN"
+}
+
 variable "ami_type" {
   type        = string
-  description = "The AMI type to use for the cluster. Required if cluster_amis is not set"
+  description = "The [latest] AMI type to use for the cluster. Required if cluster_amis is not set"
   default     = null
 }
 

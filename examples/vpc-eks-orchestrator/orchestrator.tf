@@ -1,12 +1,11 @@
+# create the orchestrator components in aws and harness
 module "cluster-orchestrator" {
-  source = "git::https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator.git?ref=main"
+  source = "../../"
+  # source = "git::https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator.git?ref=main"
 
   cluster_name     = module.eks.cluster_name
   cluster_endpoint = module.eks.cluster_endpoint
   cluster_oidc_arn = module.eks.oidc_provider_arn
-  # we tag these in the modules for vpc and eks
-  # cluster_subnet_ids = data.aws_subnets.ise-lab-private.ids
-  # cluster_security_group_ids = module.eks.node_security_group_id
 
   ami_type           = var.ami-type
   kubernetes_version = var.eks-version
@@ -14,6 +13,7 @@ module "cluster-orchestrator" {
   ccm_k8s_connector_id = harness_platform_connector_kubernetes_cloud_cost.eks.id
 }
 
+# define your specific settings for how the orchestrator should run
 resource "harness_cluster_orchestrator_config" "orchestrator" {
   orchestrator_id = module.cluster-orchestrator.harness_cluster_orchestrator_id
   distribution {
@@ -23,6 +23,7 @@ resource "harness_cluster_orchestrator_config" "orchestrator" {
   }
 }
 
+# deploy the orchestrator into the cluster
 resource "helm_release" "orchestrator" {
   name             = "harness-ccm-cluster-orchestrator"
   repository       = "https://lightwing-downloads.s3.ap-southeast-1.amazonaws.com/cluster-orchestrator-helm-chart"
@@ -60,4 +61,6 @@ resource "helm_release" "orchestrator" {
     value = module.cluster-orchestrator.harness_ccm_token
     type  = "string"
   }
+
+  depends_on = [module.delegate]
 }
