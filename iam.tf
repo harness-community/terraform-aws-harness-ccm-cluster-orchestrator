@@ -86,6 +86,7 @@ resource "aws_iam_role_policy_attachment" "controller_role" {
 }
 
 resource "aws_eks_access_entry" "node_role" {
+  count         = var.create_eks_access_entry ? 1 : 0
   cluster_name  = var.cluster_name
   principal_arn = aws_iam_role.node_role.arn
   type          = "EC2_LINUX"

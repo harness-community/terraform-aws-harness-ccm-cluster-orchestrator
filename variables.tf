@@ -53,4 +53,9 @@ variable "kubernetes_version" {
   default     = null
   description = "Kubernetes version to use for the node group. Required if ami_type is set"
 }
-  
+
+variable "create_eks_access_entry" {
+  type        = bool
+  default     = false
+  description = "Create EKS access entry for the node role. Usually done by the Harness SaaS"
+}
