@@ -53,4 +53,3 @@ variable "kubernetes_version" {
   default     = null
   description = "Kubernetes version to use for the node group. Required if ami_type is set"
 }
-  
