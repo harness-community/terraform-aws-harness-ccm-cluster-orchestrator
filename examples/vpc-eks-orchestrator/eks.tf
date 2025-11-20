@@ -10,7 +10,18 @@ module "eks" {
   endpoint_public_access = true
 
   addons = {
-    coredns = {}
+    coredns = {
+      configuration_values = jsonencode({
+        tolerations : [
+          {
+            effect : "NoSchedule",
+            key : "compute",
+            operator : "Equal",
+            value : "dedicated"
+          }
+        ]
+      })
+    }
     eks-pod-identity-agent = {
       before_compute = true
     }
@@ -41,6 +52,14 @@ module "eks" {
       max_size     = 1
       desired_size = 1
 
+      taints = {
+        compute = {
+          key    = "compute"
+          value  = "dedicated"
+          effect = "NO_SCHEDULE"
+        }
+      }
+
       tags = var.tags
     }
   }
@@ -70,6 +89,14 @@ module "delegate" {
   delegate_image   = "us-docker.pkg.dev/gar-prod-setup/harness-public/harness/delegate:25.10.86901"
   replicas         = 1
   upgrader_enabled = true
+
+  values = <<EOF
+    tolerations:
+    - key: "compute"
+      operator: "Equal"
+      value: "dedicated"
+      effect: "NoSchedule"
+EOF
 
   depends_on = [module.eks]
 }

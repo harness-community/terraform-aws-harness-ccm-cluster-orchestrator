@@ -12,7 +12,7 @@ module "cluster-orchestrator" {
   kubernetes_version = data.aws_eks_cluster.this.version
 
   cluster_subnet_ids         = data.aws_eks_cluster.this.vpc_config[0].subnet_ids
-  cluster_security_group_ids = toset(concat(data.aws_eks_cluster.this.vpc_config[0].cluster_security_group_id, data.aws_eks_cluster.this.vpc_config[0].security_group_ids))
+  cluster_security_group_ids = toset(concat([data.aws_eks_cluster.this.vpc_config[0].cluster_security_group_id], tolist(data.aws_eks_cluster.this.vpc_config[0].security_group_ids)))
 
   ccm_k8s_connector_id = var.ccm_k8s_connector_id
 }

@@ -24,7 +24,26 @@ a basic cluster, to run a few add-ons, the delegate, and the orchestrator compon
 │   memory   2188Mi (14%)  4536Mi (30%)  │
 ```
 
-we can use a single t4g.medium ($25/mo on-demand, $15/mo reserved) node to run dedicated components
+we can use a single t4g.medium ($25/mo on-demand, $15/mo reserved) node to run dedicated components, this combined with the $70 base cost of EKS gives our cluster a total cost of $95/mo before workloads are provisioned
+
+if we were to use fargate pods for the delegate and orchestrator the cost would be x2 a single t4g.medium ($0.034/hr)
+
+| Comp     | CPU        | MEM         | Size   | Fargate Cost |
+|----------|------------|-------------|--------|--------------|
+| Delegate | 0.04048/hr | 0.004445/hr | 1x4    | 0.05826/hr   |
+| Orch     | 0.04048/hr | 0.004445/hr | .25x.5 | 0.0123425/hr |
+|          |            |             |        |              |
+| Total    |            |             |        | 0.0706025/hr |
+
+adding a taint to the default dedicated nodepool and corresponding toleration to the orchestrator and delegate (along with addones) will allow the system componenets to run on this node while workloads run on compute provisioned by the orchestrator
+
+```
+tolerations:
+- key: "compute"
+  operator: "Equal"
+  value: "dedicated"
+  effect: "NoSchedule"
+```
 
 ## orchestrator
 

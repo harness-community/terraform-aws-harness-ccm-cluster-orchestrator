@@ -53,6 +53,12 @@ resource "helm_release" "orchestrator" {
       image = {
         tag = "alpha-0.5.2.1"
       }
+      tolerations = [{
+        key      = "compute"
+        operator = "Equal"
+        value    = "dedicated"
+        effect   = "NoSchedule"
+      }]
     }
   })]
 

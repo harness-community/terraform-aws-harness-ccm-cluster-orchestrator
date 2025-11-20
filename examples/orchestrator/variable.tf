@@ -17,7 +17,7 @@ variable "ami_type" {
 variable "cluster_amis" {
   type        = list(string)
   description = "The AMIs to use for the cluster. Required if ami_type is not set"
-  default     = null
+  default     = []
 }
 
 variable "ccm_k8s_connector_id" {
