@@ -35,3 +35,22 @@ variable "ccm_k8s_connector_id" {
   type        = string
   description = "harness ccm kubernetes connector for the cluster"
 }
+
+variable "node_role_policies" {
+  type        = list(string)
+  default     = []
+  description = "List of IAM policies to attach to the node role"
+}
+
+variable "ami_type" {
+  type        = string
+  default     = "AL2_x86_64"
+  description = "Type of AMI to use for the node group"
+}
+
+variable "kubernetes_version" {
+  type        = string
+  default     = null
+  description = "Kubernetes version to use for the node group. Required if ami_type is set"
+}
+  
