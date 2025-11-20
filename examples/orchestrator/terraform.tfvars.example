@@ -1,0 +1,7 @@
+cluster_name = "my-test-cluster"
+
+cluster_oidc_arn = "arn:aws:iam::000000000000:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/6A946D6D57E3E0F37CC0DFE54508C8E0"
+
+ami_type = "AL2023_ARM_64_STANDARD"
+
+ccm_k8s_connector_id = "my_test_cluster_ccm"
