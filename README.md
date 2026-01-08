@@ -4,6 +4,8 @@ terraform module to provision resources related to harness ccm cluster orchestra
 
 ## Example
 
+set up the [aws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs) and [harness](https://registry.terraform.io/providers/harness/harness/latest/docs) provider
+
 ### In-Line Values
 
 ```
@@ -39,7 +41,7 @@ module "cluster-orchestrator" {
   cluster_endpoint           = module.eks.cluster_endpoint
   cluster_oidc_arn           = module.eks.oidc_provider_arn
   cluster_subnet_ids         = module.vpc.private_subnets
-  cluster_security_group_ids = module.eks.node_security_group_id
+  cluster_security_group_ids = [module.eks.node_security_group_id]
   ami_type                   = "AL2_x86_64"
   kubernetes_version         = module.eks.cluster_version
   ccm_k8s_connector_id       = "dev-ccm"
