@@ -1,73 +1,76 @@
-# terraform-aws-harness-ccm-cluster-orchestrator
+# vpc eks delegateorchestrator
 
-terraform module to provision AWS and Harness resources for enabling cluster orchestrator on an eks cluster
+deploy a new vpc and eks cluster using aws modules bootrstrapped with a harness delegate and connectors
 
-## Getting started
+then create the orchestrator components in aws, the orchestrator resource in harness, and configure the orchestrator
 
-you will need the following components before you deploy the cluster orchestrator:
+this will need to be done in two parts, saving the helm install for the delegate and orchestrator until after the cluster is created
 
-- a vpc and eks cluster, with an oidc provider created and the metrics-server installed
-- a harness delegate deployed in the cluster, along with a kubernetes and ccm kubernetes connector created at the account level
-
-once the above are created, this module provisioned, you will be ready to [deploy the orchestrator using helm](https://developer.harness.io/docs/cloud-cost-management/use-ccm-cost-optimization/cluster-orchestrator/enablement-methods/setting-up-co-helm#step-3-install-the-cluster-orchestrator)
-
-based on what you already have deployed there are a set of `examples/` to help you get started
-
-If you have:
-- nothing
-  - [examples/vpc-eks-delegate-orchestrator](https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator/tree/main/examples/vpc-eks-delegate-orchestrator)
-- a vpc
-  - [examples/eks-delegate-orchestrator](https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator/tree/main/examples/eks-delegate-orchestrator)
-- a vpc and eks cluster
-  - [examples/delegate-orchestrator](https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator/tree/main/examples/delegate-orchestrator)
-- a vpc, eks cluster, a delegate and connectors (which are usually deployed together)
-  - [examples/orchestrator](https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator/tree/main/examples/orchestrator)
-
-### In-Line Values
-
-the following is an example of using the module with hard coded values, this illustrates the typical values expected
-
+this can be done with opentofu's -exclude option:
 ```
-module "cluster-orchestrator" {
-  source = "git::https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator.git"
-
-  cluster_name       = "dev"
-  cluster_endpoint   = "https://example-cluster-endpoint.amazonaws.com"
-  cluster_oidc_arn   = "arn:aws:iam::123456789012:oidc-provider/oidc.eks.us-west-2.amazonaws.com/id/EXAMPLE"
-  cluster_subnet_ids = [
-    "subnet-12345678"
-  ]
-  cluster_security_group_ids = [
-    "sg-12345678"
-  ]
-  ami_type = "AL2_x86_64"
-  kubernetes_version = "1.32"
-  ccm_k8s_connector_id = "dev-ccm"
-}
+tofu apply -exclude="helm_release.orchestrator" -exclude="module.delegate.helm_release.delegate"
 ```
 
-you can opt to pre-tag your subnets and security groups with the required labels for the cluster orchestrator to function, and then omit the `cluster_subnet_ids` and `cluster_security_group_ids` arguments
+then a full apply can be done:
+```
+tofu apply
+```
 
-if you want to use a specific AMI rather than the EKS default for the specific kubernetes version, you can do so with `cluster_amis`
+## vpc
 
-### Using VPC+EKS Module (recommended)
+`vpc.tf`
 
-if you are provisioning your cluster with terraform, it is best practice to include this module in the same project. below is an example of referncing existing terraform resources for inputs to the module:
+provision a vpc with public and private subnets
+
+use [fck-nat](https://fck-nat.dev/) instead of aws nat gateway to save 90% of costs
+
+tag subnets and security groups with the nessesary values for the orchestrator to find them:
+```
+"harness.io/${cluster name}" = "owned"
+```
+
+## eks
+
+`eks.tf`
+
+provision an EKS cluster with a single dedicated node to run the orchestrator and delegate
+
+create a harness delegate token, deploy a delegate using helm, and create a k8s and ccm k8s connector at the account level
+
+a basic cluster, to run a few add-ons, the delegate, and the orchestrator components has the following resource needs:
+```
+│   cpu      1350m (34%)   2 (51%)       │
+│   memory   2188Mi (14%)  4536Mi (30%)  │
+```
+
+we can use a single t4g.medium ($30/mo on-demand) node to run dedicated components, this combined with the $70 base cost of EKS gives our cluster a total cost of $100/mo before workloads are provisioned
+
+if we were to use fargate pods for the delegate and orchestrator the cost would be x2 a single t3.medium ($0.068/hr)
+
+| Comp     | CPU        | MEM         | Size   | Fargate Cost |
+|----------|------------|-------------|--------|--------------|
+| Delegate | 0.04048/hr | 0.004445/hr | 1x4    | 0.05826/hr   |
+| Orch     | 0.04048/hr | 0.004445/hr | .25x.5 | 0.0123425/hr |
+|          |            |             |        |              |
+| Total    |            |             |        | 0.0706025/hr |
+
+adding a taint to the default dedicated nodepool and corresponding toleration to the orchestrator and delegate (along with addones) will allow the system componenets to run on this node while workloads run on compute provisioned by the orchestrator
 
 ```
-module "cluster-orchestrator" {
-  source = "git::https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator.git"
-
-  cluster_name               = module.eks.cluster_name
-  cluster_endpoint           = module.eks.cluster_endpoint
-  cluster_oidc_arn           = module.eks.oidc_provider_arn
-  cluster_subnet_ids         = module.vpc.private_subnets
-  cluster_security_group_ids = module.eks.node_security_group_id
-  ami_type                   = "AL2_x86_64"
-  kubernetes_version         = module.eks.cluster_version
-  ccm_k8s_connector_id       = "dev-ccm"
-}
+tolerations:
+- key: "compute"
+  operator: "Equal"
+  value: "dedicated"
+  effect: "NoSchedule"
 ```
+
+## orchestrator
+
+`orchestrator.tf`
+
+deploy the orchestrator into the cluster using helm
+
+configure the cluster for 100% spot usage
 
 ## Requirements
 
@@ -81,8 +84,8 @@ module "cluster-orchestrator" {
 
 | Name | Version |
 |------|---------|
-| aws | >= 4.16 |
-| harness | >= 0.34.0 |
+| aws | 6.17.0 |
+| harness | 0.38.9 |
 
 ## Modules
 
@@ -95,6 +98,7 @@ No modules.
 | [aws_ec2_tag.cluster_ami_tag](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_tag) | resource |
 | [aws_ec2_tag.cluster_security_group_tag](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_tag) | resource |
 | [aws_ec2_tag.cluster_subnet_tag](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_tag) | resource |
+| [aws_eks_access_entry.node_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_access_entry) | resource |
 | [aws_iam_instance_profile.instance_profile](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
 | [aws_iam_policy.controller_role_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.controller_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |

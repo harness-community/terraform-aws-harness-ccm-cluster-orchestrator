@@ -14,14 +14,15 @@ module "cluster-orchestrator" {
 }
 
 # define your specific settings for how the orchestrator should run
-resource "harness_cluster_orchestrator_config" "orchestrator" {
-  orchestrator_id = module.cluster-orchestrator.harness_cluster_orchestrator_id
-  distribution {
-    ondemand_replica_percentage = 0.0
-    selector                    = "ALL"
-    strategy                    = "CostOptimized"
-  }
-}
+# currently broken - fix ccm-
+# resource "harness_cluster_orchestrator_config" "orchestrator" {
+#   orchestrator_id = module.cluster-orchestrator.harness_cluster_orchestrator_id
+#   distribution {
+#     ondemand_replica_percentage = 0.0
+#     selector                    = "ALL"
+#     strategy                    = "CostOptimized"
+#   }
+# }
 
 # deploy the orchestrator into the cluster
 resource "helm_release" "orchestrator" {

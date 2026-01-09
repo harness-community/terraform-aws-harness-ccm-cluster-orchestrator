@@ -4,9 +4,9 @@ these examples are meant to help you get started with cluster orchestrator with 
 
 this should not be used as production code and will most likely require changes to fit your specific deployment scenario
 
-## vpc-eks-orchestrator
+## vpc-eks-delegate-orchestrator
 
-provision a vpc and eks cluster using aws modules and then deploy the orchestrator
+provision a full stack eks cluster that leverages the orchestrator
 
 ## orchestrator
 
