@@ -1,6 +1,8 @@
-# orchestrator
+# delegate orchestrator
 
-create the orchestrator components in aws, the orchestrator resource in harness, and configure the orchestrator
+deploy a harness delegate into an eks cluster and create the nessesary connectors in harness to enable ccm
+
+then create the orchestrator components in aws, the orchestrator resource in harness, and configure the orchestrator
 
 ## vpc
 
@@ -47,6 +49,7 @@ configure the cluster for 100% spot usage
 | Name | Source | Version |
 |------|--------|---------|
 | cluster-orchestrator | ../../ | n/a |
+| delegate | harness/harness-delegate/kubernetes | 0.2.3 |
 
 ## Resources
 
@@ -54,6 +57,9 @@ configure the cluster for 100% spot usage
 |------|------|
 | [aws_ec2_tag.cluster_node_security_group_tag](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_tag) | resource |
 | [aws_ec2_tag.cluster_subnet_tag](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_tag) | resource |
+| [harness_platform_connector_kubernetes.eks](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/platform_connector_kubernetes) | resource |
+| [harness_platform_connector_kubernetes_cloud_cost.eks](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/platform_connector_kubernetes_cloud_cost) | resource |
+| [harness_platform_delegatetoken.eks](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/platform_delegatetoken) | resource |
 | [helm_release.orchestrator](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [aws_eks_cluster.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/eks_cluster) | data source |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
@@ -66,11 +72,11 @@ configure the cluster for 100% spot usage
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | ami-type | AMI type to use | `string` | `"AL2_x86_64"` | no |
-| ccm\_k8s\_connector\_id | CCM k8s connector ID | `string` | n/a | yes |
 | cluster\_oidc\_arn | OIDC ARN for the EKS cluster | `string` | n/a | yes |
 | eks-cluster-name | EKS cluster name | `string` | n/a | yes |
 | eks-cluster-node-security-group-ids | EKS cluster node security group IDs | `list(string)` | n/a | yes |
 | eks-version | EKS version to use | `string` | `"1.32"` | no |
+| manager\_endpoint | Manager endpoint for the delegate | `string` | `"https://app.harness.io/gratis"` | no |
 | subnet\_ids | Subnet IDs | `list(string)` | n/a | yes |
 | tags | Tags to apply to the cluster nodes | `map(string)` | `{}` | no |
 | vpc\_id | VPC ID | `string` | n/a | yes |

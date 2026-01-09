@@ -10,7 +10,7 @@ module "cluster-orchestrator" {
   ami_type           = var.ami-type
   kubernetes_version = var.eks-version
 
-  ccm_k8s_connector_id = var.ccm_k8s_connector_id
+  ccm_k8s_connector_id = harness_platform_connector_kubernetes_cloud_cost.eks.id
 }
 
 # define your specific settings for how the orchestrator should run
@@ -35,7 +35,7 @@ resource "helm_release" "orchestrator" {
   values = [yamlencode({
     harness = {
       accountID      = data.harness_platform_current_account.current.id
-      k8sConnectorID = var.ccm_k8s_connector_id
+      k8sConnectorID = harness_platform_connector_kubernetes_cloud_cost.eks.id
     }
     eksCluster = {
       name              = data.aws_eks_cluster.this.name
@@ -62,4 +62,6 @@ resource "helm_release" "orchestrator" {
     value = module.cluster-orchestrator.harness_ccm_token
     type  = "string"
   }
+
+  depends_on = [module.delegate]
 }

@@ -1,3 +1,9 @@
+variable "name" {
+  type        = string
+  default     = null
+  description = "Name prefix for the cluster"
+}
+
 variable "vpc_id" {
   type        = string
   description = "VPC ID"
@@ -8,25 +14,10 @@ variable "subnet_ids" {
   description = "Subnet IDs"
 }
 
-variable "eks-cluster-name" {
-  type        = string
-  description = "EKS cluster name"
-}
-
-variable "eks-cluster-node-security-group-ids" {
-  type        = list(string)
-  description = "EKS cluster node security group IDs"
-}
-
 variable "eks-version" {
   type        = string
   default     = "1.32"
   description = "EKS version to use"
-}
-
-variable "cluster_oidc_arn" {
-  type        = string
-  description = "OIDC ARN for the EKS cluster"
 }
 
 variable "ami-type" {
@@ -41,7 +32,8 @@ variable "tags" {
   description = "Tags to apply to the cluster nodes"
 }
 
-variable "ccm_k8s_connector_id" {
+variable "manager_endpoint" {
   type        = string
-  description = "CCM k8s connector ID"
+  default     = "https://app.harness.io/gratis"
+  description = "Manager endpoint for the delegate"
 }

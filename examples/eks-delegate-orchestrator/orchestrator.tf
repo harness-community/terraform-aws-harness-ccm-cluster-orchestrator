@@ -3,14 +3,14 @@ module "cluster-orchestrator" {
   source = "../../"
   # source = "git::https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator.git?ref=main"
 
-  cluster_name     = data.aws_eks_cluster.this.name
-  cluster_endpoint = data.aws_eks_cluster.this.endpoint
-  cluster_oidc_arn = var.cluster_oidc_arn
+  cluster_name     = module.eks.cluster_name
+  cluster_endpoint = module.eks.cluster_endpoint
+  cluster_oidc_arn = module.eks.oidc_provider_arn
 
   ami_type           = var.ami-type
   kubernetes_version = var.eks-version
 
-  ccm_k8s_connector_id = var.ccm_k8s_connector_id
+  ccm_k8s_connector_id = harness_platform_connector_kubernetes_cloud_cost.eks.id
 }
 
 # define your specific settings for how the orchestrator should run
@@ -35,13 +35,13 @@ resource "helm_release" "orchestrator" {
   values = [yamlencode({
     harness = {
       accountID      = data.harness_platform_current_account.current.id
-      k8sConnectorID = var.ccm_k8s_connector_id
+      k8sConnectorID = harness_platform_connector_kubernetes_cloud_cost.eks.id
     }
     eksCluster = {
-      name              = data.aws_eks_cluster.this.name
+      name              = module.eks.cluster_name
       region            = data.aws_region.current.region
       controllerRoleARN = module.cluster-orchestrator.eks_cluster_controller_role_arn
-      endpoint          = data.aws_eks_cluster.this.endpoint
+      endpoint          = module.eks.cluster_endpoint
       defaultInstanceProfile = {
         name = module.cluster-orchestrator.eks_cluster_default_instance_profile
       }
@@ -54,6 +54,12 @@ resource "helm_release" "orchestrator" {
       image = {
         tag = "alpha-0.5.2.1"
       }
+      tolerations = [{
+        key      = "compute"
+        operator = "Equal"
+        value    = "dedicated"
+        effect   = "NoSchedule"
+      }]
     }
   })]
 
@@ -62,4 +68,6 @@ resource "helm_release" "orchestrator" {
     value = module.cluster-orchestrator.harness_ccm_token
     type  = "string"
   }
+
+  depends_on = [module.delegate]
 }
