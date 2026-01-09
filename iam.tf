@@ -68,37 +68,6 @@ resource "aws_iam_policy" "controller_role_policy" {
   })
 }
 
-resource "aws_iam_role_policy" "harness_describe_permissions" {
-  name = format("%s-%s", local.short_cluster_name, "HarnessDescribePermissions")
-  role = var.cluster.existing_node_role
-
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = [
-          "ec2:DescribeImages",
-          "ec2:DescribeInstanceTypeOfferings",
-          "ec2:DescribeInstanceTypes",
-          "ec2:DescribeAvailabilityZones",
-          "ec2:DescribeLaunchTemplates",
-          "ec2:CreateLaunchTemplate",
-          "ec2:CreateTags",
-          "pricing:GetProducts",
-          "ec2:DescribeSpotPriceHistory",
-          "ec2:CreateFleet",
-          "iam:PassRole",
-          "ec2:RunInstances",
-          "ec2:DeleteLaunchTemplate",
-          "ec2:TerminateInstances"
-        ]
-        Effect   = "Allow"
-        Resource = "*"
-      },
-    ]
-  })
-}
-
 data "aws_iam_policy_document" "controller_trust_policy" {
   statement {
     actions = ["sts:AssumeRole", "sts:AssumeRoleWithWebIdentity"]
@@ -132,7 +101,7 @@ resource "aws_iam_role" "controller_role" {
 
 resource "aws_iam_role_policy_attachment" "controller_role" {
   role       = aws_iam_role.controller_role.name
-  policy_arn = var.cluster.eks_pod_identityaws_iam_policy.controller_role_policy.arn
+  policy_arn = aws_iam_policy.controller_role_policy.arn
 }
 
 resource "aws_eks_access_entry" "node_role" {
