@@ -31,6 +31,18 @@ variable "cluster_amis" {
   description = "AMIs used in your EKS cluster; If passed will be tagged with required orchestrator labels"
 }
 
+variable "eks_pod_identity" {
+  type        = bool
+  default     = false
+  description = "Enable EKS pod identity"
+}
+
+variable "enable_eks_pod_identity_addon" {
+  type        = bool
+  default     = false
+  description = "Enable EKS pod identity addon"
+}
+
 variable "ccm_k8s_connector_id" {
   type        = string
   description = "harness ccm kubernetes connector for the cluster"
