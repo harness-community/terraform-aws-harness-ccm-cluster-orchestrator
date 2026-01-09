@@ -41,7 +41,8 @@ variable "tags" {
   description = "Tags to apply to the cluster nodes"
 }
 
-variable "ccm_k8s_connector_id" {
+variable "manager_endpoint" {
   type        = string
-  description = "CCM k8s connector ID"
+  default     = "https://app.harness.io/gratis"
+  description = "Manager endpoint for the delegate"
 }

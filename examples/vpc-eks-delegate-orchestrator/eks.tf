@@ -10,6 +10,18 @@ module "eks" {
   endpoint_public_access = true
 
   addons = {
+    metrics-server = {
+      configuration_values = jsonencode({
+        tolerations : [
+          {
+            effect : "NoSchedule",
+            key : "compute",
+            operator : "Equal",
+            value : "dedicated"
+          }
+        ]
+      })
+    }
     coredns = {
       configuration_values = jsonencode({
         tolerations : [
@@ -46,7 +58,7 @@ module "eks" {
 
       ami_type = var.ami-type
 
-      instance_types = ["t4g.medium"]
+      instance_types = ["t3.medium"]
 
       min_size     = 1
       max_size     = 1
@@ -85,12 +97,13 @@ module "delegate" {
   delegate_name    = local.name
   deploy_mode      = "KUBERNETES"
   namespace        = "harness-delegate-ng"
-  manager_endpoint = "https://app.harness.io/gratis"
+  manager_endpoint = var.manager_endpoint
   delegate_image   = "us-docker.pkg.dev/gar-prod-setup/harness-public/harness/delegate:25.10.86901"
   replicas         = 1
   upgrader_enabled = true
 
   values = <<EOF
+    tags: "orchestrator,aws,eks"
     tolerations:
     - key: "compute"
       operator: "Equal"

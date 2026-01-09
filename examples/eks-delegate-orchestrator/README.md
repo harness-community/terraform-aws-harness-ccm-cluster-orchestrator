@@ -1,14 +1,28 @@
-# vpc eks orchestrator
+# vpc eks delegateorchestrator
 
-deploy a new vpc and eks cluster using aws modules bootrstrapped with a harness delegate and connectors
+deploy a new eks cluster using aws modules bootrstrapped with a harness delegate and connectors
 
-then create the orchestrator components in aws, the cluster and harness
+then create the orchestrator components in aws, the orchestrator resource in harness, and configure the orchestrator
+
+this will need to be done in two parts, saving the helm install for the delegate and orchestrator until after the cluster is created
+
+this can be done with opentofu's -exclude option:
+```
+tofu apply -exclude="helm_release.orchestrator" -exclude="module.delegate.helm_release.delegate"
+```
+
+then a full apply can be done:
+```
+tofu apply
+```
 
 ## vpc
 
-`vpc.tf`
+tag subnets with the nessesary values for the orchestrator to find them:
 
-provision a vpc with public and private subnets
+```
+"harness.io/${cluster name}" = "owned"
+```
 
 ## eks
 
@@ -24,9 +38,9 @@ a basic cluster, to run a few add-ons, the delegate, and the orchestrator compon
 │   memory   2188Mi (14%)  4536Mi (30%)  │
 ```
 
-we can use a single t4g.medium ($25/mo on-demand, $15/mo reserved) node to run dedicated components, this combined with the $70 base cost of EKS gives our cluster a total cost of $95/mo before workloads are provisioned
+we can use a single t4g.medium ($30/mo on-demand) node to run dedicated components, this combined with the $70 base cost of EKS gives our cluster a total cost of $100/mo before workloads are provisioned
 
-if we were to use fargate pods for the delegate and orchestrator the cost would be x2 a single t4g.medium ($0.034/hr)
+if we were to use fargate pods for the delegate and orchestrator the cost would be x2 a single t3.medium ($0.068/hr)
 
 | Comp     | CPU        | MEM         | Size   | Fargate Cost |
 |----------|------------|-------------|--------|--------------|
@@ -65,42 +79,44 @@ configure the cluster for 100% spot usage
 
 | Name | Version |
 |------|---------|
-| aws | 6.21.0 |
-| harness | 0.39.2 |
-| helm | 2.17.0 |
-| random | 3.7.2 |
+| aws | ~> 6.0 |
+| harness | ~> 0.0 |
+| helm | ~> 2.17 |
+| random | n/a |
 
 ## Modules
 
 | Name | Source | Version |
 |------|--------|---------|
-| cluster-orchestrator | git::https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator.git | main |
+| cluster-orchestrator | ../../ | n/a |
 | delegate | harness/harness-delegate/kubernetes | 0.2.3 |
 | eks | terraform-aws-modules/eks/aws | = 21.8.0 |
-| fck-nat | RaJiska/fck-nat/aws | n/a |
-| vpc | terraform-aws-modules/vpc/aws | ~> 6.0 |
 
 ## Resources
 
 | Name | Type |
 |------|------|
-| [harness_cluster_orchestrator_config.orchestrator](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/cluster_orchestrator_config) | resource |
+| [aws_ec2_tag.cluster_subnet_tag](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_tag) | resource |
 | [harness_platform_connector_kubernetes.eks](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/platform_connector_kubernetes) | resource |
 | [harness_platform_connector_kubernetes_cloud_cost.eks](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/platform_connector_kubernetes_cloud_cost) | resource |
 | [harness_platform_delegatetoken.eks](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/platform_delegatetoken) | resource |
 | [helm_release.orchestrator](https://registry.terraform.io/providers/hashicorp/helm/latest/docs/resources/release) | resource |
 | [random_pet.name](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/pet) | resource |
 | [aws_region.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/region) | data source |
+| [aws_subnets.cluster_subnets](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/subnets) | data source |
 | [harness_platform_current_account.current](https://registry.terraform.io/providers/harness/harness/latest/docs/data-sources/platform_current_account) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| ami-type | n/a | `string` | `"AL2023_ARM_64_STANDARD"` | no |
-| eks-version | n/a | `string` | `"1.32"` | no |
-| name | n/a | `string` | `null` | no |
-| tags | n/a | `map(string)` | `{}` | no |
+| ami-type | AMI type to use | `string` | `"AL2_x86_64"` | no |
+| eks-version | EKS version to use | `string` | `"1.32"` | no |
+| manager\_endpoint | Manager endpoint for the delegate | `string` | `"https://app.harness.io/gratis"` | no |
+| name | Name prefix for the cluster | `string` | `null` | no |
+| subnet\_ids | Subnet IDs | `list(string)` | n/a | yes |
+| tags | Tags to apply to the cluster nodes | `map(string)` | `{}` | no |
+| vpc\_id | VPC ID | `string` | n/a | yes |
 
 ## Outputs
 
@@ -116,6 +132,3 @@ configure the cluster for 100% spot usage
 | harness\_ccm\_token | n/a |
 | harness\_cluster\_orchestrator\_id | n/a |
 | name | Name |
-| private\_subnets | Private Subnets |
-| public\_subnets | Public Subnets |
-| vpc\_id | VPC ID |
