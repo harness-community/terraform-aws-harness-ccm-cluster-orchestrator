@@ -8,6 +8,7 @@ data "aws_subnets" "cluster_subnets" {
 resource "aws_ec2_tag" "cluster_subnet_tag" {
   for_each    = toset(data.aws_subnets.cluster_subnets.ids)
   resource_id = each.value
-  key         = format("harness.io/%s", var.eks-cluster-name)
+  key         = format("harness.io/%s", var.eks_cluster_name)
   value       = "owned"
 }
+

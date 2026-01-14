@@ -1,6 +1,6 @@
 name = "my-test-cluster"
 
-eks-version = "1.32"
+eks_version = "1.32"
 
 ami_type = "AL2023_ARM_64_STANDARD"
 

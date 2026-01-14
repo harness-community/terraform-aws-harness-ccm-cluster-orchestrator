@@ -7,8 +7,8 @@ module "cluster-orchestrator" {
   cluster_endpoint = data.aws_eks_cluster.this.endpoint
   cluster_oidc_arn = var.cluster_oidc_arn
 
-  ami_type           = var.ami-type
-  kubernetes_version = var.eks-version
+  ami_type           = var.ami_type
+  kubernetes_version = var.eks_version
 
   ccm_k8s_connector_id = harness_platform_connector_kubernetes_cloud_cost.eks.id
 }
@@ -65,3 +65,4 @@ resource "helm_release" "orchestrator" {
 
   depends_on = [module.delegate]
 }
+

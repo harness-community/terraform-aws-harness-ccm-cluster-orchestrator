@@ -1,12 +1,12 @@
 data "aws_eks_cluster" "this" {
-  name = var.eks-cluster-name
+  name = var.eks_cluster_name
 }
 
 #   - tag the cluster security group with the harness required tags for the orchestrator
 data "aws_security_groups" "cluster_node_security_groups" {
   filter {
     name   = "group-name"
-    values = var.eks-cluster-node-security-group-ids
+    values = var.eks_cluster_node_security_group_ids
   }
 }
 

@@ -3,7 +3,7 @@ name = "my-test-cluster"
 vpc_id = "vpc-12345678"
 subnet_ids = ["subnet-12345678", "subnet-23456789"]
 
-eks-version = "1.32"
+eks_version = "1.32"
 
 ami_type = "AL2023_ARM_64_STANDARD"
 

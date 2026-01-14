@@ -14,13 +14,13 @@ variable "subnet_ids" {
   description = "Subnet IDs"
 }
 
-variable "eks-version" {
+variable "eks_version" {
   type        = string
   default     = "1.32"
   description = "EKS version to use"
 }
 
-variable "ami-type" {
+variable "ami_type" {
   type        = string
   default     = "AL2_x86_64"
   description = "AMI type to use"
@@ -37,3 +37,4 @@ variable "manager_endpoint" {
   default     = "https://app.harness.io/gratis"
   description = "Manager endpoint for the delegate"
 }
+

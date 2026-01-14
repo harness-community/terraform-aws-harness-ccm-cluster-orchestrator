@@ -8,17 +8,17 @@ variable "subnet_ids" {
   description = "Subnet IDs"
 }
 
-variable "eks-cluster-name" {
+variable "eks_cluster_name" {
   type        = string
   description = "EKS cluster name"
 }
 
-variable "eks-cluster-node-security-group-ids" {
+variable "eks_cluster_node_security_group_ids" {
   type        = list(string)
   description = "EKS cluster node security group IDs"
 }
 
-variable "eks-version" {
+variable "eks_version" {
   type        = string
   default     = "1.32"
   description = "EKS version to use"
@@ -29,7 +29,7 @@ variable "cluster_oidc_arn" {
   description = "OIDC ARN for the EKS cluster"
 }
 
-variable "ami-type" {
+variable "ami_type" {
   type        = string
   default     = "AL2_x86_64"
   description = "AMI type to use"

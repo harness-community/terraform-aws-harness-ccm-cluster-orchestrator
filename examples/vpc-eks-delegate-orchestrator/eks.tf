@@ -5,7 +5,7 @@ module "eks" {
   version = "= 21.8.0"
 
   name               = local.name
-  kubernetes_version = var.eks-version
+  kubernetes_version = var.eks_version
 
   endpoint_public_access = true
 
@@ -56,7 +56,7 @@ module "eks" {
     default = {
       name = substr(local.name, 0, 20)
 
-      ami_type = var.ami-type
+      ami_type = var.ami_type
 
       instance_types = ["t3.medium"]
 
