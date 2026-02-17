@@ -38,6 +38,7 @@ resource "aws_iam_policy" "controller_role_policy" {
           "ec2:RunInstances",
           "ec2:CreateTags",
           "iam:PassRole",
+          "iam:ListInstanceProfiles",
           "ec2:TerminateInstances",
           "ec2:DeleteLaunchTemplate",
           "ec2:DescribeLaunchTemplates",
