@@ -126,7 +126,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| ami\_type | Type of AMI to use for the node group | `string` | `"AL2_x86_64"` | no |
+| ami\_type | Type of AMI to use for the node group | `string` | `"AL2023_ARM_64_STANDARD"` | no |
 | ccm\_k8s\_connector\_id | harness ccm kubernetes connector for the cluster | `string` | n/a | yes |
 | cluster\_amis | AMIs used in your EKS cluster; If passed will be tagged with required orchestrator labels | `list(string)` | `[]` | no |
 | cluster\_endpoint | EKS cluster endpoint | `string` | n/a | yes |
