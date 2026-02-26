@@ -45,7 +45,7 @@ variable "node_role_policies" {
 
 variable "ami_type" {
   type        = string
-  default     = "AL2_x86_64"
+  default     = "AL2023_ARM_64_STANDARD"
   description = "Type of AMI to use for the node group"
 }
 
