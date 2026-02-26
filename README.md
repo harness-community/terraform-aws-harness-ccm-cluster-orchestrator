@@ -131,7 +131,7 @@ No modules.
 | cluster\_amis | AMIs used in your EKS cluster; If passed will be tagged with required orchestrator labels | `list(string)` | `[]` | no |
 | cluster\_endpoint | EKS cluster endpoint | `string` | n/a | yes |
 | cluster\_name | EKS cluster Name | `string` | n/a | yes |
-| cluster\_oidc\_arn | OIDC Provder ARN for the cluster | `string` | n/a | yes |
+| cluster\_oidc\_arn | OIDC Provder ARN for the cluster. Required if `use_eks_pod_identity` is `false` | `string` | `null` | no |
 | cluster\_security\_group\_ids | Security group IDs used in your EKS cluster; If passed will be tagged with required orchestrator labels | `list(string)` | `[]` | no |
 | cluster\_subnet\_ids | Subnet IDs used in your EKS cluster; If passed will be tagged with required orchestrator labels | `list(string)` | `[]` | no |
 | kubernetes\_version | Kubernetes version to use for the node group. Required if ami\_type is set | `string` | `null` | no |

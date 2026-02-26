@@ -10,6 +10,7 @@ variable "cluster_endpoint" {
 
 variable "cluster_oidc_arn" {
   type        = string
+  default     = null
   description = "OIDC Provder ARN for the cluster"
 }
 
