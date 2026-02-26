@@ -70,10 +70,12 @@ resource "aws_iam_policy" "controller_role_policy" {
 
 data "aws_iam_policy_document" "controller_trust_policy" {
   statement {
-    actions = ["sts:AssumeRole", "sts:AssumeRoleWithWebIdentity"]
+    actions = var.use_eks_pod_identity ? ["sts:AssumeRole", "sts:TagSession"] : ["sts:AssumeRole", "sts:AssumeRoleWithWebIdentity"]
     principals {
-      type = "Federated"
-      identifiers = [
+      type = var.use_eks_pod_identity ? "Service" : "Federated"
+      identifiers = var.use_eks_pod_identity ? [
+        "pods.eks.amazonaws.com"
+        ] : [
         var.cluster_oidc_arn
       ]
     }
@@ -96,4 +98,12 @@ resource "aws_eks_access_entry" "node_role" {
   cluster_name  = var.cluster_name
   principal_arn = aws_iam_role.node_role.arn
   type          = "EC2_LINUX"
+}
+
+resource "aws_eks_pod_identity_association" "controller_role" {
+  count           = var.use_eks_pod_identity ? 1 : 0
+  cluster_name    = local.short_cluster_name
+  namespace       = var.cluster_orchestrator_namespace
+  service_account = var.cluster_orchestrator_service_account
+  role_arn        = aws_iam_role.controller_role.arn
 }
