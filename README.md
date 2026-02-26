@@ -71,6 +71,13 @@ module "cluster-orchestrator" {
 }
 ```
 
+### Use EKS Pod Identity instead of IRSA
+
+If you would like to use [EKS Pod Identity](https://docs.aws.amazon.com/eks/latest/userguide/pod-identities.html) as opposed to IRSA for providing IAM permissions, simply set `use_eks_pod_identity` to `true`. This does require you have the EKS Pod Identity Agent configured in your EKS cluster. If you don't have an EKS cluster, the following examples will install the agent along with other add-ons:
+
+- [examples/vpc-eks-delegate-orchestrator](https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator/tree/main/examples/vpc-eks-delegate-orchestrator)
+- [examples/eks-delegate-orchestrator](https://github.com/harness-community/terraform-aws-harness-ccm-cluster-orchestrator/tree/main/examples/eks-delegate-orchestrator)
+
 ## Requirements
 
 | Name | Version |
@@ -103,6 +110,7 @@ No modules.
 | [aws_iam_role.node_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy_attachment.controller_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.node_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
+| [aws_eks_pod_identity_association.controller_roleaws_iam_role_policy_attachment.node_role](https://registry.terraform.io/providers/-/aws/latest/docs/resources/eks_pod_identity_association) | resource |
 | [harness_cluster_orchestrator.cluster_orchestrator](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/cluster_orchestrator) | resource |
 | [harness_platform_apikey.api_key](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/platform_apikey) | resource |
 | [harness_platform_role_assignments.cluster_orch_role](https://registry.terraform.io/providers/harness/harness/latest/docs/resources/platform_role_assignments) | resource |
@@ -123,10 +131,13 @@ No modules.
 | cluster\_amis | AMIs used in your EKS cluster; If passed will be tagged with required orchestrator labels | `list(string)` | `[]` | no |
 | cluster\_endpoint | EKS cluster endpoint | `string` | n/a | yes |
 | cluster\_name | EKS cluster Name | `string` | n/a | yes |
-| cluster\_oidc\_arn | OIDC Provder ARN for the cluster | `string` | n/a | yes |
+| cluster\_oidc\_arn | OIDC Provder ARN for the cluster. Required if `use_eks_pod_identity` is `false` | `string` | `null` | no |
 | cluster\_security\_group\_ids | Security group IDs used in your EKS cluster; If passed will be tagged with required orchestrator labels | `list(string)` | `[]` | no |
 | cluster\_subnet\_ids | Subnet IDs used in your EKS cluster; If passed will be tagged with required orchestrator labels | `list(string)` | `[]` | no |
 | kubernetes\_version | Kubernetes version to use for the node group. Required if ami\_type is set | `string` | `null` | no |
+| cluster\_orchestrator\_namespace | Kubernetes namespace Cluster Orchestrator is being installed in | `string` | `kube-system` | no |
+| cluster\_orchestrator\_service\_account | Kubernetes service account used by the Cluster Orchestrator Operator component | `string` | `ccm-cluster-orchestrator-operator` | no |
+| use\_eks\_pod\_identity | If EKS Pod Identity should be used for IAM as opposed to IRSA | `bool` | `false` | no |
 | node\_role\_policies | List of IAM policies to attach to the node role | `list(string)` | `[]` | no |
 
 ## Outputs
