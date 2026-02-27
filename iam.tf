@@ -83,9 +83,21 @@ data "aws_iam_policy_document" "controller_trust_policy" {
   }
 }
 
+data "aws_iam_policy_document" "pod_identity_controller_trust_policy" {
+  statement {
+    sid    = "AllowEksAuthToAssumeRoleForPodIdentity"
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["pods.eks.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole", "sts:TagSession"]
+  }
+}
+
 resource "aws_iam_role" "controller_role" {
   name               = format("%s-%s-%s", "harness-ccm", local.short_cluster_name, "controller")
-  assume_role_policy = data.aws_iam_policy_document.controller_trust_policy.json
+  assume_role_policy = var.cluster.eks_pod_identity ? data.aws_iam_policy_document.pod_identity_controller_trust_policy.json : data.aws_iam_policy_document.controller_trust_policy.json
   description        = format("%s %s %s", "Role to manage", var.cluster_name, "EKS cluster controller used by Harness CCM")
 }
 
